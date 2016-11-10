@@ -21,7 +21,15 @@ module Opal
 
       initializer 'opal.asset_paths', :after => 'sprockets.environment', :group => :all do |app|
         Opal.paths.each do |path|
-          app.assets.append_path path
+          if config.respond_to?(:assets) && config.assets.respond_to?(:configure)
+            # Rails 4.x
+            config.assets.configure do |env|
+              env.append_path path
+            end
+          else
+            # Rails 3.2
+            app.assets.append_path path
+          end
         end
       end
 
